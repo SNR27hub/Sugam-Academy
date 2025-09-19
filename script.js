@@ -26,8 +26,6 @@ const loginRegisterBtn = document.getElementById('loginRegisterBtn');
 const userAuthenticatedControls = document.querySelector('.user-authenticated-controls');
 const notificationBell = document.getElementById('notificationBell');
 const notificationCount = document.getElementById('notificationCount');
-// ... (The rest of the original DOM elements are here) ...
-
 const authModal = document.getElementById('authModal'); 
 const showLoginTab = document.getElementById('showLoginTab');
 const showRegisterTab = document.getElementById('showRegisterTab');
@@ -98,7 +96,7 @@ const itemPriceToBuy = document.getElementById('itemPriceToBuy');
 const itemUTRNumber = document.getElementById('itemUTRNumber');
 const itemPaymentSection = document.getElementById('itemPaymentSection');
 const bannerSlider = document.getElementById('bannerSlider');
-const bannerSliderContainer = document.getElementById('bannerSliderContainer'); // *** NEW ***
+const bannerSliderContainer = document.getElementById('bannerSliderContainer'); 
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const currentBannerButtonWrapper = document.getElementById('currentBannerButtonWrapper');
@@ -168,7 +166,7 @@ const chatMessageInput = document.getElementById('chatMessageInput');
 const adminChatList = document.getElementById('adminChatList');
 const adminChatWindow = document.getElementById('adminChatWindow');
 const notificationToastContainer = document.getElementById('notificationToastContainer');
-const shareButton = document.getElementById('shareButton'); // *** NEW ***
+const shareButton = document.getElementById('shareButton');
 
 let currentVideoToBuy = {}; 
 let currentPaymentType = ''; 
@@ -534,7 +532,6 @@ function loadBanners() {
     });
 }
 
-// *** UPDATED: Banner Slider with Automatic Slide and Swipe/Drag ***
 function initBannerSlider(banners) {
     const slides = document.querySelectorAll('.banner-slide');
     if (slides.length === 0) {
@@ -548,44 +545,37 @@ function initBannerSlider(banners) {
         currentTranslate = 0,
         prevTranslate = 0,
         animationID;
+    
+    // Set initial banner image as CSS variable for background
+    const initialImageUrl = banners[0]?.imageUrl;
+    document.documentElement.style.setProperty('--initial-bg-image', initialImageUrl ? `url('${initialImageUrl}')` : 'none');
 
-    // Functions to move to next/previous slide
-    const nextSlide = () => {
-        currentBannerIndex = (currentBannerIndex + 1) % slides.length;
-        updateSliderAndButton();
-    };
-
-    const prevSlide = () => {
-        currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length;
-        updateSliderAndButton();
-    };
-
-    // Main function to update slider position and button
-    function updateSliderAndButton() {
+    // Function to update the slider position and button based on the current index
+    const updateSliderAndButton = () => {
         const offset = -currentBannerIndex * 100;
         bannerSlider.style.transition = 'transform 0.5s ease-out';
         bannerSlider.style.transform = `translateX(${offset}%)`;
-
-        // CRITICAL FIX: Update prevTranslate to match the current visual position
         prevTranslate = offset;
 
-        const currentBannerImageUrl = banners[currentBannerIndex]?.imageUrl;
-        document.documentElement.style.setProperty('--initial-bg-image', currentBannerImageUrl ? `url('${currentBannerImageUrl}')` : 'none');
-
+        const currentBanner = banners[currentBannerIndex];
         currentBannerButtonWrapper.innerHTML = '';
-        if (banners[currentBannerIndex]?.buttonText && banners[currentBannerIndex]?.buttonUrl) {
-            const buttonHtml = `<a href="${banners[currentBannerIndex].buttonUrl}" target="_blank" class="btn btn-primary">${banners[currentBannerIndex].buttonText}</a>`;
+        if (currentBanner?.buttonText && currentBanner?.buttonUrl) {
+            const buttonHtml = `<a href="${currentBanner.buttonUrl}" target="_blank" class="btn btn-primary">${currentBanner.buttonText}</a>`;
             currentBannerButtonWrapper.innerHTML = buttonHtml;
             currentBannerButtonWrapper.style.display = 'block';
         } else {
             currentBannerButtonWrapper.style.display = 'none';
         }
 
-        // Reset and restart automatic sliding
         resetAutoSlide();
-    }
+    };
 
     // Automatic sliding setup
+    const nextSlide = () => {
+        currentBannerIndex = (currentBannerIndex + 1) % slides.length;
+        updateSliderAndButton();
+    };
+    
     const startAutoSlide = () => {
         if (slides.length > 1) {
             bannerInterval = setInterval(nextSlide, 5000);
@@ -598,22 +588,19 @@ function initBannerSlider(banners) {
     };
 
     // Swipe/Drag event handlers
-    function dragStart(index) {
-        return function(event) {
-            isDragging = true;
-            startPos = getPositionX(event);
-            bannerSlider.style.transition = 'none'; // Remove transition for smooth dragging
-            animationID = requestAnimationFrame(animation);
-            bannerSlider.classList.add('grabbing');
-            clearInterval(bannerInterval); // Stop auto-slide on drag
-        }
+    function dragStart(event) {
+        isDragging = true;
+        startPos = getPositionX(event);
+        bannerSlider.style.transition = 'none';
+        animationID = requestAnimationFrame(animation);
+        bannerSlider.classList.add('grabbing');
+        clearInterval(bannerInterval);
     }
 
     function dragMove(event) {
         if (isDragging) {
             const currentPosition = getPositionX(event);
             const sliderWidth = bannerSlider.clientWidth;
-            // Calculate translate value based on drag distance
             currentTranslate = prevTranslate + ((currentPosition - startPos) / sliderWidth) * 100;
         }
     }
@@ -625,7 +612,6 @@ function initBannerSlider(banners) {
         bannerSlider.classList.remove('grabbing');
 
         const movedBy = currentTranslate - prevTranslate;
-        // Swipe threshold: if moved more than 10% of slider width, change slide
         if (movedBy < -10 && currentBannerIndex < slides.length - 1) {
             currentBannerIndex++;
         }
@@ -646,18 +632,15 @@ function initBannerSlider(banners) {
     }
 
     // Attach event listeners
-    slides.forEach((slide, index) => {
-        // Prevent image dragging
+    slides.forEach((slide) => {
         const slideImg = slide.querySelector('img');
         if (slideImg) slideImg.addEventListener('dragstart', (e) => e.preventDefault());
         
-        // Touch events
-        slide.addEventListener('touchstart', dragStart(index));
+        slide.addEventListener('touchstart', dragStart);
         slide.addEventListener('touchend', dragEnd);
         slide.addEventListener('touchmove', dragMove);
         
-        // Mouse events
-        slide.addEventListener('mousedown', dragStart(index));
+        slide.addEventListener('mousedown', dragStart);
         slide.addEventListener('mouseup', dragEnd);
         slide.addEventListener('mouseleave', dragEnd);
         slide.addEventListener('mousemove', dragMove);
@@ -665,13 +648,15 @@ function initBannerSlider(banners) {
 
     // Arrow button listeners
     nextBtn.addEventListener('click', nextSlide);
-    prevBtn.addEventListener('click', prevSlide);
+    prevBtn.addEventListener('click', () => {
+        currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length;
+        updateSliderAndButton();
+    });
 
     // Initial setup
     currentBannerIndex = 0;
     updateSliderAndButton();
 }
-// *** END of Banner Slider Update ***
 
 function loadTeachers() {
     db.ref('teachers').on('value', snapshot => {
@@ -1236,8 +1221,7 @@ function loadAdminPlans() {
 addPlanBtn.addEventListener('click', () => { planForm.reset(); planForm.dataset.editId = ''; planFormContainer.style.display = 'block'; });
 cancelPlan.addEventListener('click', () => planFormContainer.style.display = 'none');
 planForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('planName').value.trim(); const price = parseFloat(document.getElementById('planPrice').value); const description = document.getElementById('planDescription').value.trim();
+    e.preventDefault(); const name = document.getElementById('planName').value.trim(); const price = parseFloat(document.getElementById('planPrice').value); const description = document.getElementById('planDescription').value.trim();
     if (!name || isNaN(price) || price <= 0) return alert('Name and valid price are required.');
     const data = { name, price, description: description || null }; const editId = planForm.dataset.editId;
     if (editId) db.ref('plans/' + editId).update(data).then(() => alert('Plan updated!'));
@@ -1507,8 +1491,6 @@ function openAdminChat(userId, userName) {
         document.getElementById('adminChatMessageInput').value = '';
     });
 }
-
-// *** NEW: Share Button Functionality ***
 shareButton.addEventListener('click', async () => {
     const shareData = {
         title: 'Sugam Academy',
@@ -1520,12 +1502,10 @@ shareButton.addEventListener('click', async () => {
             await navigator.share(shareData);
             console.log('Shared successfully');
         } else {
-            // Fallback for browsers that do not support the Share API
             alert('Share feature is not supported on your browser. Please copy the link manually.');
         }
     } catch (err) {
         console.error('Error sharing:', err);
     }
 });
-
 updateUI(null);
