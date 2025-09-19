@@ -1992,3 +1992,47 @@ html[lang="or"] .payment-notice .lang-or {
     color: #94a3b8;
     cursor: pointer;
 }
+/* Share Button Styles */
+.share-container {
+    position: relative;
+    display: inline-block;
+}
+
+.share-dropdown {
+    display: none; /* Shuru mein chupa hua rahega */
+    position: absolute;
+    top: 120%; /* Button ke neeche dikhega */
+    right: 0;
+    background-color: white;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-medium);
+    padding: 0.75rem 1rem;
+    z-index: 1010;
+    display: flex;
+    gap: 1.2rem;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.share-dropdown.show {
+    display: flex; /* Jab 'show' class lagegi tab dikhega */
+}
+
+.share-dropdown a {
+    font-size: 1.8rem;
+    color: var(--dark);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.share-dropdown a:hover {
+    transform: scale(1.2) translateY(-2px);
+}
+
+/* Social Media ke alag-alag colors hover par */
+.share-dropdown .fa-whatsapp:hover { color: #25D366; }
+.share-dropdown .fa-facebook:hover { color: #1877F2; }
+.share-dropdown .fa-twitter:hover { color: #1DA1F2; }
+.share-dropdown .fa-telegram-plane:hover { color: #0088cc; }
+/* Hide Arrow Buttons for Swipe Functionality */
+.slider-controls {
+    display: none;
+}
