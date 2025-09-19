@@ -534,55 +534,7 @@ function loadBanners() {
         }
     });
 }
-function initBannerSlider(banners) {
-    const slides = document.querySelectorAll('.banner-slide');
-    if (slides.length === 0) {
-        currentBannerButtonWrapper.style.display = 'none';
-        heroDynamicBg.style.backgroundImage = 'none';
-        return;
-    }
-    function updateSliderAndButton() {
-        const offset = -currentBannerIndex * 100;
-        bannerSlider.style.transform = `translateX(${offset}%)`;
-        const currentBannerImageUrl = banners[currentBannerIndex]?.imageUrl;
-        if (currentBannerImageUrl) {
-            document.documentElement.style.setProperty('--initial-bg-image', `url('${currentBannerImageUrl}')`);
-        } else {
-            document.documentElement.style.setProperty('--initial-bg-image', 'none');
-        }
-        currentBannerButtonWrapper.innerHTML = ''; 
-        if (banners[currentBannerIndex]?.buttonText && banners[currentBannerIndex]?.buttonUrl) {
-            const buttonHtml = `<a href="${banners[currentBannerIndex].buttonUrl}" target="_blank" class="btn btn-primary">${banners[currentBannerIndex].buttonText}</a>`;
-            currentBannerButtonWrapper.innerHTML = buttonHtml;
-            currentBannerButtonWrapper.style.display = 'block';
-        } else {
-            currentBannerButtonWrapper.style.display = 'none';
-        }
-    }
-    currentBannerIndex = 0; 
-    updateSliderAndButton();
-    const oldPrevBtn = document.getElementById('prevBtn');
-    const oldNextBtn = document.getElementById('nextBtn');
-    const newPrevBtn = oldPrevBtn.cloneNode(true);
-    const newNextBtn = oldNextBtn.cloneNode(true);
-    oldPrevBtn.replaceWith(newPrevBtn);
-    oldNextBtn.replaceWith(newNextBtn);
-    newNextBtn.addEventListener('click', () => { 
-        currentBannerIndex = (currentBannerIndex + 1) % slides.length;
-        updateSliderAndButton();
-    });
-    newPrevBtn.addEventListener('click', () => { 
-        currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length;
-        updateSliderAndButton();
-    });
-    clearInterval(bannerInterval);
-    if (slides.length > 1) { 
-        bannerInterval = setInterval(() => {
-            currentBannerIndex = (currentBannerIndex + 1) % slides.length;
-            updateSliderAndButton();
-        }, 5000);
-    }
-}
+
 function loadTeachers() {
     db.ref('teachers').on('value', snapshot => {
         const fragment = document.createDocumentFragment();
@@ -598,7 +550,122 @@ function loadTeachers() {
             teacherCard.className = 'teacher-card';
             let imageSliderHtml = photos.length > 0
                 ? `<div class="teacher-image-slider" data-current="0">${photos.map((url, index) => `<div class="slide ${index === 0 ? 'active' : ''}"><img src="${url}" alt="${teacher.name || 'Teacher'} photo"></div>`).join('')}</div>`
-                : `<i class="fas fa-user" style="font-size: 5rem;"></i>`;
+                : `<i class="fas fa-user" style="font-size:// Banner Slider Logic (REVISED WITH SWIPE FUNCTIONALITY)
+function initBannerSlider(banners) {
+    const slides = document.querySelectorAll('.banner-slide');
+    
+    // Agar 0 ya 1 hi banner hai, toh slide karne ki zaroorat nahi
+    if (slides.length <= 1) {
+        if (slides.length === 1) {
+            // Sirf ek banner ke liye visuals update karein
+            bannerSlider.style.transform = `translateX(0%)`;
+            const currentBannerImageUrl = banners[0]?.imageUrl;
+            document.documentElement.style.setProperty('--initial-bg-image', currentBannerImageUrl ? `url('${currentBannerImageUrl}')` : 'none');
+            
+            currentBannerButtonWrapper.innerHTML = '';
+            if (banners[0]?.buttonText && banners[0]?.buttonUrl) {
+                const buttonHtml = `<a href="${banners[0].buttonUrl}" target="_blank" class="btn btn-primary">${banners[0].buttonText}</a>`;
+                currentBannerButtonWrapper.innerHTML = buttonHtml;
+                currentBannerButtonWrapper.style.display = 'block';
+            } else {
+                currentBannerButtonWrapper.style.display = 'none';
+            }
+        }
+        return; // Function se bahar aa jayein
+    }
+
+    // Slider ko update karne wala function
+    const updateSliderAndButton = (transition = true) => {
+        // Agar transition false hai, to achanak move hoga (sliding ke dauran)
+        if (!transition) {
+            bannerSlider.style.transition = 'none';
+        }
+
+        const offset = -currentBannerIndex * 100;
+        bannerSlider.style.transform = `translateX(${offset}%)`;
+
+        // Thodi der baad transition wapas on kar dein
+        if (!transition) {
+            setTimeout(() => {
+                bannerSlider.style.transition = 'transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            }, 50);
+        }
+
+        const currentBannerImageUrl = banners[currentBannerIndex]?.imageUrl;
+        if(currentBannerImageUrl) {
+            document.documentElement.style.setProperty('--initial-bg-image', `url('${currentBannerImageUrl}')`);
+        } else {
+             document.documentElement.style.setProperty('--initial-bg-image', 'none');
+        }
+
+        currentBannerButtonWrapper.innerHTML = ''; 
+        if (banners[currentBannerIndex]?.buttonText && banners[currentBannerIndex]?.buttonUrl) {
+            const buttonHtml = `<a href="${banners[currentBannerIndex].buttonUrl}" target="_blank" class="btn btn-primary">${banners[currentBannerIndex].buttonText}</a>`;
+            currentBannerButtonWrapper.innerHTML = buttonHtml;
+            currentBannerButtonWrapper.style.display = 'block';
+        } else {
+            currentBannerButtonWrapper.style.display = 'none';
+        }
+    };
+
+    // Auto-slide ke timer ko shuru ya reset karne wala function
+    const startAutoSlide = () => {
+        clearInterval(bannerInterval); // Purana timer band karein
+        bannerInterval = setInterval(() => {
+            currentBannerIndex = (currentBannerIndex + 1) % slides.length;
+            updateSliderAndButton();
+        }, 5000); // Har 5 second mein slide hoga
+    };
+    
+    // --- SWIPE FUNCTIONALITY START ---
+    let startX = 0;
+    let currentX = 0;
+    let diffX = 0;
+    let isDragging = false;
+    const swipeThreshold = 50; // Kam se kam 50px slide karne par hi slide change hoga
+
+    bannerSlider.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+        isDragging = true;
+        clearInterval(bannerInterval); // Jab user touch kare, auto-slide rok do
+        bannerSlider.style.transition = 'none'; // Smooth drag ke liye transition hata do
+    });
+
+    bannerSlider.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        currentX = e.touches[0].clientX;
+        diffX = currentX - startX;
+        // Slider ko ungli ke saath move karo
+        const baseOffset = -currentBannerIndex * bannerSlider.offsetWidth;
+        bannerSlider.style.transform = `translateX(${baseOffset + diffX}px)`;
+    });
+
+    bannerSlider.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        bannerSlider.style.transition = 'transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1)'; // Transition wapas laga do
+
+        // Check karo ki swipe hua ya nahi
+        if (diffX < -swipeThreshold) {
+            // Swipe Left (Next slide)
+            currentBannerIndex = (currentBannerIndex + 1) % slides.length;
+        } else if (diffX > swipeThreshold) {
+            // Swipe Right (Previous slide)
+            currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length;
+        }
+        
+        // Final position par slide ko set karo
+        updateSliderAndButton();
+        startAutoSlide(); // Swipe ke baad auto-slide phir se shuru karo
+    });
+    // --- SWIPE FUNCTIONALITY END ---
+
+    // Shuruaat ke liye setup
+    currentBannerIndex = 0;
+    updateSliderAndButton();
+    startAutoSlide(); // Auto-sliding shuru karein
+                }
+5rem;"></i>`;
             teacherCard.innerHTML = `
                 <div class="teacher-img">${imageSliderHtml}</div>
                 <div class="teacher-info">
@@ -1418,3 +1485,39 @@ function openAdminChat(userId, userName) {
     });
 }
 updateUI(null);
+// --- SHARE BUTTON LOGIC ---
+const shareBtn = document.getElementById('shareBtn');
+const shareDropdown = document.getElementById('shareDropdown');
+
+// Yeh function share links banata hai
+function setupShareLinks() {
+    // Yahan humne aapka fix homepage URL daala hai taaki photo wala preview hamesha kaam kare
+    const siteUrl = "https://snr27hub.github.io/Sugam-Academy/";
+    const shareText = "Check out Sugam Academy for amazing educational resources for +2 and +3! Developed by SNR.";
+    
+    const encodedUrl = encodeURIComponent(siteUrl);
+    const encodedText = encodeURIComponent(shareText);
+
+    document.getElementById('shareWhatsapp').href = `https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`;
+    document.getElementById('shareFacebook').href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+    document.getElementById('shareTwitter').href = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`;
+    document.getElementById('shareTelegram').href = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+}
+
+// Button par click karne se dropdown dikhega/chupega
+shareBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Yeh zaroori hai
+    shareDropdown.classList.toggle('show');
+});
+
+// Kahin aur click karne par dropdown band ho jayega
+document.addEventListener('click', (e) => {
+    if (!shareDropdown.contains(e.target) && !shareBtn.contains(e.target)) {
+        if (shareDropdown.classList.contains('show')) {
+            shareDropdown.classList.remove('show');
+        }
+    }
+});
+
+// Page load hote hi share links taiyar ho jayenge
+setupShareLinks();
