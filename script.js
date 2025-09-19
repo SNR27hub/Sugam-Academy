@@ -22,11 +22,11 @@ const UPI_NAME = 'Sugam Academy';
 const UPI_CURRENCY = 'INR';
 
 // DOM Elements
-const loginRegisterBtn = document.getElementById('loginRegisterBtn'); 
+const loginRegisterBtn = document.getElementById('loginRegisterBtn');
 const userAuthenticatedControls = document.querySelector('.user-authenticated-controls');
 const notificationBell = document.getElementById('notificationBell');
 const notificationCount = document.getElementById('notificationCount');
-const authModal = document.getElementById('authModal'); 
+const authModal = document.getElementById('authModal');
 const showLoginTab = document.getElementById('showLoginTab');
 const showRegisterTab = document.getElementById('showRegisterTab');
 const loginFormContainer = document.getElementById('loginFormContainer');
@@ -152,10 +152,10 @@ const cancelGalleryItem = document.getElementById('cancelGalleryItem');
 const galleryTableBody = document.getElementById('galleryTableBody');
 const topScorerBanner = document.getElementById('topScorerBanner');
 const instagramPopupModal = document.getElementById('instagramPopupModal');
-const instagramCloseIcon = document.getElementById('instagramCloseIcon'); 
-const instagramPopupContainer = instagramPopupModal.querySelector('.popup-container'); 
-const instagramFollowBtn = instagramPopupModal.querySelector('.follow-btn'); 
-const instagramCloseBtnInner = instagramPopupModal.querySelector('.close-btn'); 
+const instagramCloseIcon = document.getElementById('instagramCloseIcon');
+const instagramPopupContainer = instagramPopupModal.querySelector('.popup-container');
+const instagramFollowBtn = instagramPopupModal.querySelector('.follow-btn');
+const instagramCloseBtnInner = instagramPopupModal.querySelector('.close-btn');
 const instagramFollowerCount = document.getElementById('follower-count');
 const chatFab = document.getElementById('chatFab');
 const chatWidget = document.getElementById('chatWidget');
@@ -168,11 +168,11 @@ const adminChatWindow = document.getElementById('adminChatWindow');
 const notificationToastContainer = document.getElementById('notificationToastContainer');
 const shareButton = document.getElementById('shareButton');
 
-let currentVideoToBuy = {}; 
-let currentPaymentType = ''; 
-let currentQuizData = null; 
-let currentQuizId = null; 
-let currentAdminChatUserId = null; 
+let currentVideoToBuy = {};
+let currentPaymentType = '';
+let currentQuizData = null;
+let currentQuizId = null;
+let currentAdminChatUserId = null;
 let currentUserView = '+2';
 let currentBannerIndex = 0;
 let bannerInterval;
@@ -181,7 +181,9 @@ let followerUpdateInterval;
 let displayedUserNames = [];
 let userNameRotationInterval;
 let userNotificationBarInterval;
+let bannerListenersAttached = false; // Flag to prevent multiple event listeners
 const VERIFIED_BADGE_IMG_URL = 'https://i.postimg.cc/02bVmN0y/badge.png';
+
 profileMenuToggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     profileDropdownMenu.style.display = profileDropdownMenu.style.display === 'block' ? 'none' : 'block';
@@ -501,6 +503,107 @@ forgotPassword.addEventListener('click', (e) => {
             });
     }
 });
+
+// *** CORRECTED AND REWRITTEN BANNER SLIDER LOGIC ***
+
+// Global variable to hold the banner initialization function to prevent re-attaching listeners
+let initBannerSlider = (function() {
+    let listenersAttached = false; // This will be private to the closure
+
+    return function(banners) { // The actual function that will be called
+        const slides = bannerSlider.querySelectorAll('.banner-slide');
+        if (slides.length === 0) {
+            bannerSliderContainer.style.display = 'none';
+            return;
+        }
+
+        let currentIndex = 0;
+        let autoSlideInterval;
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        // Function to go to a specific slide
+        const goToSlide = (index) => {
+            // Boundary checks
+            if (index < 0) {
+                index = slides.length - 1;
+            } else if (index >= slides.length) {
+                index = 0;
+            }
+            
+            currentIndex = index;
+            const offset = -currentIndex * 100;
+            bannerSlider.style.transform = `translateX(${offset}%)`;
+
+            // Update background and button
+            const currentBanner = banners[currentIndex];
+            if (currentBanner) {
+                const imageUrl = currentBanner.imageUrl;
+                document.documentElement.style.setProperty('--initial-bg-image', imageUrl ? `url('${imageUrl}')` : 'none');
+                
+                currentBannerButtonWrapper.innerHTML = '';
+                if (currentBanner.buttonText && currentBanner.buttonUrl) {
+                    const buttonHtml = `<a href="${currentBanner.buttonUrl}" target="_blank" class="btn btn-primary">${currentBanner.buttonText}</a>`;
+                    currentBannerButtonWrapper.innerHTML = buttonHtml;
+                    currentBannerButtonWrapper.style.display = 'block';
+                } else {
+                    currentBannerButtonWrapper.style.display = 'none';
+                }
+            }
+        };
+
+        // Functions for next/prev
+        const nextSlide = () => goToSlide(currentIndex + 1);
+        const prevSlide = () => goToSlide(currentIndex - 1);
+
+        // Function to start and reset auto sliding
+        const startAutoSlide = () => {
+            clearInterval(autoSlideInterval);
+            if (slides.length > 1) {
+                autoSlideInterval = setInterval(nextSlide, 5000);
+            }
+        };
+
+        // Swipe handling logic
+        const handleTouchStart = (e) => {
+            touchStartX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            clearInterval(autoSlideInterval); // Pause auto slide on interaction
+        };
+
+        const handleTouchEnd = (e) => {
+            touchEndX = e.type === 'touchend' ? e.changedTouches[0].clientX : e.clientX;
+            handleSwipe();
+            startAutoSlide(); // Resume auto slide after interaction
+        };
+        
+        const handleSwipe = () => {
+            const swipeThreshold = 50; // Minimum pixels for a swipe
+            if (touchStartX - touchEndX > swipeThreshold) {
+                nextSlide();
+            } else if (touchEndX - touchStartX > swipeThreshold) {
+                prevSlide();
+            }
+        };
+
+        // Attach event listeners ONLY ONCE
+        if (!listenersAttached) {
+            prevBtn.addEventListener('click', () => { prevSlide(); startAutoSlide(); });
+            nextBtn.addEventListener('click', () => { nextSlide(); startAutoSlide(); });
+
+            bannerSlider.addEventListener('mousedown', handleTouchStart);
+            bannerSlider.addEventListener('mouseup', handleTouchEnd);
+            bannerSlider.addEventListener('touchstart', handleTouchStart, { passive: true });
+            bannerSlider.addEventListener('touchend', handleTouchEnd, { passive: true });
+            
+            listenersAttached = true;
+        }
+        
+        // Initial setup
+        goToSlide(0);
+        startAutoSlide();
+    };
+})();
+
 function loadBanners() {
     db.ref('banners').on('value', snapshot => {
         bannerSlider.innerHTML = '';
@@ -515,6 +618,7 @@ function loadBanners() {
                 banners.push(banner);
             }
         });
+        
         if (banners.length > 0) {
             bannerSliderContainer.style.display = 'block';
             banners.forEach(banner => {
@@ -525,136 +629,12 @@ function loadBanners() {
             });
             initBannerSlider(banners);
         } else {
-            bannerSliderContainer.style.display = 'none'; 
-            currentBannerButtonWrapper.style.display = 'none';
-            heroDynamicBg.style.backgroundImage = 'none';
+            bannerSliderContainer.style.display = 'none';
         }
     });
 }
 
-// *** CORRECTED Banner Slider with Automatic Slide and Swipe/Drag ***
-function initBannerSlider(banners) {
-    const slides = document.querySelectorAll('.banner-slide');
-    if (slides.length === 0) {
-        currentBannerButtonWrapper.style.display = 'none';
-        heroDynamicBg.style.backgroundImage = 'none';
-        return;
-    }
-
-    let isDragging = false,
-        startPos = 0,
-        currentTranslate = 0,
-        prevTranslate = 0,
-        animationID;
-
-    const getPositionX = (event) => (event.type.includes('mouse') ? event.pageX : event.touches[0].clientX);
-
-    const setSliderPosition = () => {
-        bannerSlider.style.transform = `translateX(${currentTranslate}%)`;
-    };
-
-    const animation = () => {
-        setSliderPosition();
-        if (isDragging) requestAnimationFrame(animation);
-    };
-
-    const startAutoSlide = () => {
-        clearInterval(bannerInterval);
-        if (slides.length > 1) {
-            bannerInterval = setInterval(() => {
-                currentBannerIndex = (currentBannerIndex + 1) % slides.length;
-                updateSliderAndButton();
-            }, 5000); // Auto-slide every 5 seconds
-        }
-    };
-
-    function updateSliderAndButton() {
-        const offset = -currentBannerIndex * 100;
-        
-        // This is the key fix: update the tracking variables
-        currentTranslate = offset;
-        prevTranslate = offset;
-
-        bannerSlider.style.transition = 'transform 0.5s ease-out';
-        setSliderPosition();
-
-        const currentBannerImageUrl = banners[currentBannerIndex]?.imageUrl;
-        document.documentElement.style.setProperty('--initial-bg-image', currentBannerImageUrl ? `url('${currentBannerImageUrl}')` : 'none');
-
-        currentBannerButtonWrapper.innerHTML = '';
-        if (banners[currentBannerIndex]?.buttonText && banners[currentBannerIndex]?.buttonUrl) {
-            const buttonHtml = `<a href="${banners[currentBannerIndex].buttonUrl}" target="_blank" class="btn btn-primary">${banners[currentBannerIndex].buttonText}</a>`;
-            currentBannerButtonWrapper.innerHTML = buttonHtml;
-            currentBannerButtonWrapper.style.display = 'block';
-        } else {
-            currentBannerButtonWrapper.style.display = 'none';
-        }
-        startAutoSlide();
-    }
-    
-    const dragStart = (event) => {
-        isDragging = true;
-        startPos = getPositionX(event);
-        bannerSlider.style.transition = 'none';
-        animationID = requestAnimationFrame(animation);
-        bannerSlider.classList.add('grabbing');
-        clearInterval(bannerInterval);
-    };
-
-    const dragMove = (event) => {
-        if (isDragging) {
-            const currentPosition = getPositionX(event);
-            const dragDistance = currentPosition - startPos;
-            const dragPercent = (dragDistance / bannerSlider.clientWidth) * 100;
-            currentTranslate = prevTranslate + dragPercent;
-        }
-    };
-
-    const dragEnd = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        cancelAnimationFrame(animationID);
-        bannerSlider.classList.remove('grabbing');
-
-        const movedByPercent = currentTranslate - prevTranslate;
-        
-        // Threshold check: if moved more than 20% of the width, change slide
-        if (movedByPercent < -20 && currentBannerIndex < slides.length - 1) {
-            currentBannerIndex++;
-        }
-        if (movedByPercent > 20 && currentBannerIndex > 0) {
-            currentBannerIndex--;
-        }
-
-        updateSliderAndButton();
-    };
-
-    // Remove old listeners to prevent stacking
-    if (bannerSlider.eventListenersAttached) {
-       return; 
-    }
-    
-    // Add event listeners
-    bannerSlider.addEventListener('mousedown', dragStart);
-    bannerSlider.addEventListener('touchstart', dragStart, { passive: true });
-    
-    window.addEventListener('mousemove', dragMove);
-    window.addEventListener('touchmove', dragMove, { passive: true });
-
-    window.addEventListener('mouseup', dragEnd);
-    window.addEventListener('touchend', dragEnd);
-    window.addEventListener('mouseleave', dragEnd);
-    
-    nextBtn.onclick = () => { currentBannerIndex = (currentBannerIndex + 1) % slides.length; updateSliderAndButton(); };
-    prevBtn.onclick = () => { currentBannerIndex = (currentBannerIndex - 1 + slides.length) % slides.length; updateSliderAndButton(); };
-    
-    bannerSlider.eventListenersAttached = true; // Flag to avoid re-attaching listeners
-    
-    // Initial setup
-    updateSliderAndButton();
-}
-// *** END of Banner Slider Correction ***
-
+// ... (Rest of the script.js code remains exactly the same) ...
 
 function loadTeachers() {
     db.ref('teachers').on('value', snapshot => {
