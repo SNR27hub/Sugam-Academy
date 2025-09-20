@@ -1105,28 +1105,7 @@ function getEmbeddableUrl(originalUrl) {
         return originalUrl;
     }
     return originalUrl;
-function openContentDisplayModal(url, type, title) {
-    if (!url) {
-        alert('Is content ka link upalabdh nahi hai.');
-        return;
-    }
 
-    // Video, Note ya Quiz ko naye tab mein kholne ke liye
-    window.open(url, '_blank');
-
-    // Naye tab mein khulne ke baad user ko batane ke liye
-    // ki content khul chuka hai, aap is modal ka upyog kar sakte hain.
-    // Isse user ko confusion nahi hoga.
-    contentDisplayModalTitle.textContent = title;
-    contentIframeWrapper.innerHTML = `
-        <div class="fallback-content">
-            <h4>Content naye tab mein khul chuka hai.</h4>
-            <p>Agar naya tab nahi khula, to kripya niche diye gaye button par click karein.</p>
-            <button class="btn btn-primary" onclick="window.open('${url}', '_blank')">Content Kholein</button>
-        </div>
-    `;
-    contentDisplayModal.style.display = 'flex';
-}
 
     if (/\.(pdf)$/i.test(url) || url.includes("docs.google.com")) {
         window.open(url, '_blank', 'noopener,noreferrer');
@@ -1152,7 +1131,28 @@ function openContentDisplayModal(url, type, title) {
 async function openQuizModal(quizId) {
     const quizSnap = await db.ref('content/' + quizId).once('value');
     currentQuizData = quizSnap.val(); currentQuizId = quizId;
-    if (!currentQuizData || !currentQuizData.question) return alert('Quiz not configured.');
+    if (!currentQuizData || !currentQuizData.question) return alert('Quiz not configufunction openContentDisplayModal(url, type, title) {
+    // Agar URL nahi hai to error message dikhayein
+    if (!url) {
+        alert('Is content ka link upalabdh nahi hai.');
+        return;
+    }
+
+    // Video, Note ya Quiz ko hamesha ek naye tab mein kholne ke liye
+    window.open(url, '_blank');
+
+    // Yah message user ko batane ke liye hai ki content khul chuka hai
+    contentDisplayModalTitle.textContent = title;
+    contentIframeWrapper.innerHTML = `
+        <div class="fallback-content">
+            <h4>Aapka content ek naye tab me khul chuka hai.</h4>
+            <p>Agar naya tab nahi khula, to kripya is button par click karein:</p>
+            <button class="btn btn-primary" onclick="window.open('${url}', '_blank')">Content Kholein</button>
+        </div>
+    `;
+    contentDisplayModal.style.display = 'flex';
+}
+red.');
     quizQuestionContainer.style.display = 'block'; quizFeedback.style.display = 'none';
     submitQuizAnswerBtn.style.display = 'block'; closeQuizFeedbackBtn.style.display = 'none';
     quizModalTitle.textContent = currentQuizData.title || 'Quiz';
@@ -1498,28 +1498,28 @@ function openAdminChat(userId, userName) {
 shareButton.addEventListener('click', async () => {
     const shareData = {
         title: 'Sugam Academy',
-        text: 'Join Sugam Academy for premium videos, notes, quizzes, and expert guidance for +2 and +3. Developed by SNR.',
+        text: 'Sugam Academy ke saath juden, jahan aapko milega premium content, notes, quizzes, aur expert guidance.',
         url: window.location.href
     };
     try {
-        // Koshish karein ki navigator.share se link share ho jaye
+        // Phele navigator.share se share karne ki koshish karein
         if (navigator.share) {
             await navigator.share(shareData);
             console.log('Successfully shared');
         } else {
-            // Agar navigator.share kaam nahi karta, to link ko copy karein
-            throw new Error("Share not supported");
+            // Agar navigator.share kaam nahi kiya to niche ki line error throw karegi
+            throw new Error('Share API not supported');
         }
     } catch (err) {
-        // Agar koi error aati hai (ya share support nahi hai) to link copy kar lein
+        // Yahaan woh code hai jo share API kaam na karne par chalega
         try {
+            // Clipboard API se URL ko copy karein
             await navigator.clipboard.writeText(shareData.url);
             alert('Link copy kar liya gaya hai! Ab aap ise kahin bhi paste kar sakte hain.');
         } catch (copyErr) {
-            // Agar clipboard.writeText bhi kaam nahi karta to purana message dikhayein
+            // Agar clipboard.writeText bhi kaam na kare to puraana message dikhayein
             alert('Share feature is not supported on your browser. Please copy the link manually.');
         }
     }
 });
-
 updateUI(null);
