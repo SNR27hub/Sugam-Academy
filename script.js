@@ -1496,30 +1496,27 @@ function openAdminChat(userId, userName) {
     });
 }
 shareButton.addEventListener('click', async () => {
-    const shareData = {
-        title: 'Sugam Academy',
-        text: 'Sugam Academy ke saath juden, jahan aapko milega premium content, notes, quizzes, aur expert guidance.',
-        url: window.location.href
-    };
+  const shareUrl = window.location.href;
+  const shareText = "Sugam Academy ke saath judo!";
+  
+  if (navigator.share) {
     try {
-        // Phele navigator.share se share karne ki koshish karein
-        if (navigator.share) {
-            await navigator.share(shareData);
-            console.log('Successfully shared');
-        } else {
-            // Agar navigator.share kaam nahi kiya to niche ki line error throw karegi
-            throw new Error('Share API not supported');
-        }
-    } catch (err) {
-        // Yahaan woh code hai jo share API kaam na karne par chalega
-        try {
-            // Clipboard API se URL ko copy karein
-            await navigator.clipboard.writeText(shareData.url);
-            alert('Link copy kar liya gaya hai! Ab aap ise kahin bhi paste kar sakte hain.');
-        } catch (copyErr) {
-            // Agar clipboard.writeText bhi kaam na kare to puraana message dikhayein
-            alert('Share feature is not supported on your browser. Please copy the link manually.');
-        }
+      await navigator.share({
+        title: document.title,
+        text: shareText,
+        url: shareUrl
+      });
+    } catch (error) {
+      alert("Share karne me error aa gayi. Link copy karein.");
     }
+  } else {
+    // Agar share kaam nahi kiya, to link copy kar do
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Link copy ho gaya hai!");
+    } catch (err) {
+      alert("Share feature kaam nahi kar raha. Link manually copy karein.");
+    }
+  }
 });
 updateUI(null);
