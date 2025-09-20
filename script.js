@@ -1105,25 +1105,29 @@ function getEmbeddableUrl(originalUrl) {
         return originalUrl;
     }
     return originalUrl;
-}
 function openContentDisplayModal(url, type, title) {
-    contentDisplayModalTitle.textContent = title;
-    contentIframeWrapper.innerHTML = '';
     if (!url) {
-        contentIframeWrapper.innerHTML = `<div class="fallback-content"><h4>Content Not Available</h4><p>The link for this content is missing.</p></div>`;
-        contentDisplayModal.style.display = 'flex';
+        alert('Is content ka link upalabdh nahi hai.');
         return;
     }
-    const showFallback = (originalUrl) => {
-        contentIframeWrapper.innerHTML = `
-            <div class="fallback-content">
-                <h4>Content Opened in a New Tab</h4>
-                <p>This content couldn't be displayed here directly, so we've opened it for you in a new browser tab.</p>
-                <p style="margin-top: 1rem;">If the new tab didn't open, please click the button below.</p>
-                <button class="btn btn-primary" style="margin-top: 1rem;" onclick="window.open('${originalUrl}', '_blank', 'noopener,noreferrer')">Open Content</button>
-            </div>
-        `;
-    };
+
+    // Video, Note ya Quiz ko naye tab mein kholne ke liye
+    window.open(url, '_blank');
+
+    // Naye tab mein khulne ke baad user ko batane ke liye
+    // ki content khul chuka hai, aap is modal ka upyog kar sakte hain.
+    // Isse user ko confusion nahi hoga.
+    contentDisplayModalTitle.textContent = title;
+    contentIframeWrapper.innerHTML = `
+        <div class="fallback-content">
+            <h4>Content naye tab mein khul chuka hai.</h4>
+            <p>Agar naya tab nahi khula, to kripya niche diye gaye button par click karein.</p>
+            <button class="btn btn-primary" onclick="window.open('${url}', '_blank')">Content Kholein</button>
+        </div>
+    `;
+    contentDisplayModal.style.display = 'flex';
+}
+
     if (/\.(pdf)$/i.test(url) || url.includes("docs.google.com")) {
         window.open(url, '_blank', 'noopener,noreferrer');
         showFallback(url);
@@ -1498,14 +1502,24 @@ shareButton.addEventListener('click', async () => {
         url: window.location.href
     };
     try {
+        // Koshish karein ki navigator.share se link share ho jaye
         if (navigator.share) {
             await navigator.share(shareData);
-            console.log('Shared successfully');
+            console.log('Successfully shared');
         } else {
-            alert('Share feature is not supported on your browser. Please copy the link manually.');
+            // Agar navigator.share kaam nahi karta, to link ko copy karein
+            throw new Error("Share not supported");
         }
     } catch (err) {
-        console.error('Error sharing:', err);
+        // Agar koi error aati hai (ya share support nahi hai) to link copy kar lein
+        try {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('Link copy kar liya gaya hai! Ab aap ise kahin bhi paste kar sakte hain.');
+        } catch (copyErr) {
+            // Agar clipboard.writeText bhi kaam nahi karta to purana message dikhayein
+            alert('Share feature is not supported on your browser. Please copy the link manually.');
+        }
     }
 });
+
 updateUI(null);
