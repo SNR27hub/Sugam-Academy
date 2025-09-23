@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="google-site-verification" content="BoXN-_xrR1h6w0XDyEKKTVQTRIRWDhRCx9jMS2QUaYA" />
+
+    <!-- Basic SEO -->
+    <title>SNR27hub | Developer SNR | Sugam Academy Official Site</title>
+    <meta name="description" content="Welcome to SNR27hub. Official website of Developer SNR, snr27, snr__27 and Sugam Academy. Explore education, projects, tutorials and creative works." />
+    <meta name="keywords" content="SNR, snr27, snr__27, SNR27hub, Developer SNR, Sugam Academy, SNR website, SNR official, Developer SNR projects, Sugam Academy site" />
+
+    <!-- Open Graph (Facebook, WhatsApp, LinkedIn Share) -->
+    <meta property="og:title" content="SNR27hub | Developer SNR | Sugam Academy" />
+    <meta property="og:description" content="Discover official projects, education, and resources by Developer SNR. Explore snr27, snr__27, SNR27hub, and Sugam Academy." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://snr27hub.github.io/Sugam-Academy/" />
+    <meta property="og:image" content="https://snr27hub.github.io/Sugam-Academy/preview.jpg" />
+
+    <!-- Twitter SEO -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SNR27hub | Developer SNR | Sugam Academy" />
+    <meta name="twitter:description" content="Official site of Developer SNR. Featuring snr27, snr__27, SNR27hub and Sugam Academy educational projects." />
+    <meta name="twitter:image" content="https://snr27hub.github.io/Sugam-Academy/preview.jpg" />
+
+    <!-- Mobile Friendly + Indexing -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://snr27hub.github.io/Sugam-Academy/" />
+    <meta charset="UTF-8">
+    
+    <!-- External Fonts and Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cookie&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- NEW: Firebase v9 Compatibility Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <!-- Google Translate Script -->
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</head>
+<body class="user-page">
+
+    <!-- NEW: Maintenance Mode Overlay -->
+    <div id="maintenanceMode" style="display: none;">
+        <div class="maintenance-content">
+            <img src="https://i.postimg.cc/c1YKPWds/1757931606961.jpg" alt="Developer SNR" class="maintenance-dev-photo">
+            <h1>Website Under Maintenance</h1>
+            <p>Our website is currently undergoing scheduled maintenance. We are working hard to improve your experience.</p>
+            <p><strong>We will be back shortly!</strong></p>
+            <div class="loading-spinner"></div>
+            <p class="dev-info-maintenance">Developer: SNR</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo" id="mainLogo">
+                <span class="developer-logo-text">
+                    Developer: <a href="https://www.instagram.com/snr__27?igsh=MXI4YXd5NnIxMDAzcw==" target="_blank">SNR <img src="https://i.postimg.cc/02bVmN0y/badge.png" alt="Verified" class="developer-verified-badge"></a>
+                </span>
+                <div class="main-logo-line">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Sugam Academy</span>
+                </div>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#content" class="tab-link" data-tab="videos">Videos</a></li>
+                    <li><a href="#content" class="tab-link" data-tab="notes">Notes</a></li>
+                    <li><a href="#content" class="tab-link" data-tab="quizzes">Quizzes</a></li>
+                    <li><a href="#teachers">Teachers</a></li>
+                    <li><a href="#toolsSection">Student Tools</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <!-- Language Selector -->
+                <div class="language-selector">
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="or">Odia</option>
+                        <option value="hi">Hindi</option>
+                        <option value="bn">Bengali</option>
+                        <option value="te">Telugu</option>
+                        <option value="ta">Tamil</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-outline" id="shareButton" title="Share Website">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+
+                <!-- Login/Register button for logged out users -->
+                <button class="btn btn-primary" id="loginRegisterBtn"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+                
+                <!-- Authenticated user controls -->
+                <div class="user-authenticated-controls" style="display: none;">
+                    <div class="notification-bell" id="notificationBell">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">0</span>
+                    </div>
+                    <button class="btn btn-outline" id="profileMenuToggleBtn"><i class="fas fa-bars"></i></button>
+                </div>
+
+                <!-- Profile Dropdown Menu for logged-in users -->
+                <div class="profile-dropdown-menu" id="profileDropdownMenu" style="display: none;">
+                    <ul>
+                        <li><strong><span id="dropdownUserName"></span> <img src="https://i.postimg.cc/02bVmN0y/badge.png" alt="Verified" class="verified-badge-img" id="dropdownVerifiedBadge" style="display:none;"></strong></li>
+                        <li><span id="dropdownPremiumStatus"></span></li>
+                        <li class="menu-separator"></li>
+                        <li><a href="#" id="myPurchasesLink"><i class="fas fa-shopping-bag"></i> My Purchases</a></li>
+                        <li><a href="#" id="myFavoritesLink"><i class="fas fa-heart"></i> My Favorites</a></li>
+                        <li><a href="#" id="getVerifiedBadgeLink"><i class="fas fa-shield-alt"></i> Get Verified Badge</a></li>
+                        <li><a href="#" id="viewNotificationsLink"><i class="fas fa-bell"></i> Notifications (<span id="dropdownNotificationCount">0</span>)</a></li>
+                        <li class="menu-separator"></li>
+                        <li><button class="btn btn-primary" id="dropdownGoPremiumBtn" style="width: 100%; display: none;"><i class="fas fa-crown"></i> Go Premium</button></li>
+                        <li><button class="btn btn-outline" id="dropdownLogoutBtn" style="width: 100%;"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- NEW: Search Bar -->
+            <div class="search-bar-container">
+                <input type="text" id="searchInput" placeholder="Search for videos, notes, quizzes...">
+                <button id="searchButton"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-dynamic-bg" id="heroDynamicBg"></div>
+            <div class="container hero-content">
+                <div class="banner-slider-container" id="bannerSliderContainer">
+                    <div class="banner-slider" id="bannerSlider"></div>
+                    <div class="slider-controls">
+                        <button id="prevBtn" aria-label="Previous Slide"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nextBtn" aria-label="Next Slide"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="banner-button-wrapper" id="currentBannerButtonWrapper">
+                    <!-- Dynamic button will be placed here by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: All-in-One Student Tools Section -->
+        <section class="container py-5" id="toolsSection">
+            <div class="section-title"><h2 id="toolsSectionTitle">Student Tools</h2></div>
+            <div class="tools-grid" id="toolsGrid">
+                <!-- Tools will be dynamically loaded here -->
+            </div>
+        </section>
+
+
+        <section class="container" id="content" style="display:none;">
+            <div class="section-title"><h2>Learning Resources</h2></div>
+            <div class="top-scorer-banner" id="topScorerBanner" style="display: none;"></div>
+
+            <div class="category-selector" id="categorySelector">
+                <button class="btn active" data-category="+2">+2 Section</button>
+                <button class="btn" data-category="+3">+3 Section</button>
+            </div>
+
+            <div class="content-tabs">
+                <div class="tab-link active" data-tab="videos">Videos</div>
+                <div class="tab-link" data-tab="notes">Notes</div>
+                <div class="tab-link" data-tab="quizzes">Quizzes</div>
+            </div>
+            <div class="content-section active" id="videos">
+                <div class="content-grid" id="videoContentGrid"></div>
+            </div>
+            <div class="content-section" id="notes" style="display: none;">
+                <div class="content-grid" id="notesContentGrid"></div>
+            </div>
+            <div class="content-section" id="quizzes" style="display: none;">
+                <div class="content-grid" id="quizContentGrid"></div>
+            </div>
+        </section>
+
+        <section class="container py-5" id="teachers">
+            <div class="section-title"><h2>Our Expert Teachers</h2></div>
+            <div class="teachers" id="teachersContainer"></div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>About Us</h3>
+                    <p id="footerAboutUsText"></p>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact Us</h3>
+                    <p>Email: <span id="footerSugamEmail"></span></p>
+                    <p>Developer Email: <span id="footerDeveloperEmail"></span></p>
+                    <div class="social-links">
+                        <a href="#" target="_blank" id="footerYoutubeLink"><i class="fab fa-youtube"></i></a>
+                        <a href="#" target="_blank" id="footerInstagramLink"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank" id="footerFacebookLink"><i class="fab fa-facebook"></i></a>
+                        <a href="#" target="_blank" id="footerTwitterLink"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Sugam Academy. Developed by SNR. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- All Modals (Login, Premium, etc.) -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-tabs">
+                <button id="showLoginTab" class="active">Login</button>
+                <button id="showRegisterTab">Register</button>
+            </div>
+            
+            <div class="auth-form" id="loginFormContainer">
+                <h2>Login to Your Account</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-options">
+                        <label>
+                            <input type="checkbox"> Remember me
+                        </label>
+                        <a href="#" id="forgotPassword">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+                </form>
+            </div>
+
+            <div class="auth-form" id="registerFormContainer" style="display: none;">
+                <h2>Create an Account</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input type="text" id="registerName" placeholder="Enter your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" placeholder="Create a password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerConfirmPassword">Confirm Password</label>
+                        <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="premiumModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-form">
+                <h2>Upgrade to Premium</h2>
+                <div id="premiumPaymentSection">
+                    <p class="payment-notice">
+                        <span class="lang-en">Enter the 12-digit UTR number after payment for successful verification.</span>
+                        <span class="lang-or">ପେମେଣ୍ଟ ପରେ ସଫଳ ଯାଞ୍ଚ ପାଇଁ 12-ଅଙ୍କ ବିଶିଷ୍ଟ UTR ନମ୍ବର ଦିଅନ୍ତୁ।</span>
+                    </p>
+                    <div class="payment-card">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pay using any UPI app</p>
+                        <div class="qr-container">
+                            <img src="https://i.postimg.cc/Kvwrx7JJ/Picsart-25-09-15-23-25-43-793.png" alt="UPI QR Code">
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Or pay via UPI ID</p>
+                        <div class="upi-info">
+                            <p>Amount: <span style="font-weight: 700;">₹<span id="displayPremiumAmount">0</span></span></p>
+                            <p>UPI ID: <span class="upi-id">mrperfect11457@oksbi</span></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="UTRNumber">After payment, enter 12-digit UTR number</label>
+                            <input type="text" id="UTRNumber" placeholder="Enter 12-digit UTR" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="submitPaymentDetails('premium')">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="videoBuyModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="auth-form">
+                <h2 id="buyModalTitle"></h2>
+                <div id="itemPaymentSection">
+                    <p class="payment-notice">
+                        <span class="lang-en">Enter the 12-digit UTR number after payment for successful verification.</span>
+                        <span class="lang-or">ପେମେଣ୍ଟ ପରେ ସଫଳ ଯାଞ୍ଚ ପାଇଁ 12-ଅଙ୍କ ବିଶିଷ୍ଟ UTR ନମ୍ବର ଦିଅନ୍ତୁ।</span>
+                    </p>
+                    <div class="payment-card">
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pay using any UPI app</p>
+                        <div class="qr-container">
+                            <img src="https://i.postimg.cc/Kvwrx7JJ/Picsart-25-09-15-23-25-43-793.png" alt="UPI QR Code">
+                        </div>
+                        <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Or pay via UPI ID</p>
+                        <div class="upi-info">
+                            <p>Amount: <span style="font-weight: 700;">₹<span id="itemPriceToBuy">0</span></span></p>
+                            <p>UPI ID: <span class="upi-id">mrperfect11457@oksbi</span></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemUTRNumber">After payment, enter 12-digit UTR number</label>
+                            <input type="text" id="itemUTRNumber" placeholder="Enter 12-digit UTR" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;" onclick="submitPaymentDetails(currentPaymentType)">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="quizModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="quizModalTitle"></h2>
+            <div id="quizQuestionContainer">
+                <p id="quizQuestionText" style="font-size: 1.2rem; margin-bottom: 1.5rem; font-weight: 600;"></p>
+                <div class="quiz-options" id="quizOptions"></div>
+                <button class="btn btn-primary" id="submitQuizAnswerBtn" style="width: 100%;">Submit Answer</button>
+            </div>
+            <div class="quiz-feedback" id="quizFeedback"></div>
+            <button class="btn btn-outline" id="closeQuizFeedbackBtn" style="width: 100%; margin-top: 1rem; display: none;">Close Quiz</button>
+        </div>
+    </div>
+
+    <div class="modal" id="contentDisplayModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="contentDisplayModalTitle"></h2>
+            <div class="content-iframe-wrapper"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="myFavoritesModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>My Favorites</h2>
+            <div class="modal-body" id="favoritesModalBody">
+                <div class="content-grid" id="favoritesContentGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="myPurchasesModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>My Purchases</h2>
+            <div class="modal-body" id="purchasesModalBody">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchasesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="instagramPopupModal">
+        <div class="modal-content">
+            <span class="close-modal instagram-close" id="instagramCloseIcon">&times;</span>
+            <div class="popup-container">
+                <div class="light-animation"></div>
+                <div class="pulse-circle" style="top: -75px; left: -75px;"></div>
+                <div class="pulse-circle" style="bottom: -75px; right: -75px;"></div>
+                <div class="particles" id="particles"></div>
+                <div class="header">
+                    <h2><span class="instagram-logo">Instagram</span></h2>
+                </div>
+                <div class="profile-content">
+                    <img src="https://i.postimg.cc/c1YKPWds/1757931606961.jpg" alt="Profile Image" class="profile-img">
+                    <div class="username">SNR__27 <img src="https://i.postimg.cc/02bVmN0y/badge.png" alt="Verified" class="developer-verified-badge"></div>
+                    <div class="stats">
+                        <div class="stat">
+                            <div class="stat-value" id="follower-count"><span class="loading"></span></div>
+                            <div class="stat-label">Followers</div>
+                        </div>
+                    </div>
+                    <button class="follow-btn" onclick="followUser()"><i class="fas fa-user-plus"></i> Follow</button>
+                    <button class="close-btn" onclick="closeInstagramPopup()"><i class="fas fa-times"></i> Close</button>
+                    <div class="developer-text">Follow Developer</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google Translate Element (hidden) -->
+    <div id="google_translate_element" style="display: none;"></div>
+
+    <!-- User Notification Bar -->
+    <div class="user-notification-bar" id="userNotificationBar">
+        <p><span id="userNotificationCount">0</span> users are learning with <span id="userNotificationName">Loading...</span></p>
+    </div>
+
+    <!-- Floating Chat Button and Widget -->
+    <div class="chat-fab" id="chatFab"><i class="fas fa-comments"></i></div>
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-widget-header">
+            <span>Chat with Admin</span>
+            <span class="close-chat" id="closeChatWidget">&times;</span>
+        </div>
+        <div class="chat-messages" id="chatMessagesContainer"></div>
+        <form class="chat-input-form" id="chatInputForm">
+            <input type="text" id="chatMessageInput" placeholder="Type your message..." autocomplete="off" required>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+
+    <!-- Notification Toasts Container -->
+    <div class="notification-toast-container" id="notificationToastContainer"></div>
+
+    <!-- Link to your JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
